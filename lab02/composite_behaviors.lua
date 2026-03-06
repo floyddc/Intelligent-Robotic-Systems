@@ -1,9 +1,6 @@
--- Composite behavior: phototaxis + smooth obstacle avoidance
-
 MAX_VELOCITY = 80
-BASE_SPEED = 0.5        -- forward speed as fraction of MAX_VELOCITY
-LIGHT_GAIN = 0.6        -- steering gain for light attraction
-OBSTACLE_GAIN = 1.2     -- steering gain for obstacle avoidance
+LIGHT_GAIN = 1.2        -- steering gain for light attraction
+OBSTACLE_GAIN = 1     -- steering gain for obstacle avoidance
 SPEED_REDUCTION = 0.5   -- how much obstacles slow the robot
 TURN_FAST = 0.5         -- outer wheel speed during turn
 TURN_SLOW = 0.2         -- inner wheel speed during turn
@@ -13,8 +10,8 @@ local function clamp(x,a,b)
 end
 
 function init()
-    left_v = BASE_SPEED * MAX_VELOCITY
-    right_v = BASE_SPEED * MAX_VELOCITY
+    left_v = MAX_VELOCITY
+    right_v = MAX_VELOCITY
     robot.wheels.set_velocity(left_v, right_v)
     if robot.leds then robot.leds.set_all_colors("green") end
 end
@@ -77,16 +74,17 @@ function step()
         right_v = TURN_FAST * MAX_VELOCITY * speed_factor
     else
         -- straight
-        left_v = BASE_SPEED * MAX_VELOCITY * speed_factor
-        right_v = BASE_SPEED * MAX_VELOCITY * speed_factor
+        left_v = MAX_VELOCITY * speed_factor
+        right_v = MAX_VELOCITY * speed_factor
     end
     
     robot.wheels.set_velocity(left_v, right_v)
+    end
 end
 
 function reset()
-    left_v = BASE_SPEED * MAX_VELOCITY
-    right_v = BASE_SPEED * MAX_VELOCITY
+    left_v = MAX_VELOCITY
+    right_v = MAX_VELOCITY
     robot.wheels.set_velocity(left_v, right_v)
     if robot.leds then robot.leds.set_all_colors("green") end
 end
