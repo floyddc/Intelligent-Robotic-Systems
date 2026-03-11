@@ -27,7 +27,7 @@
         <positioning implementation="default" noise_level="0.0" />
         <differential_steering implementation="default" noise_level="0"/>
       </sensors>
-     <params script="composite_behaviors.lua" />
+     <params script="./composite_behaviors.lua" />
     </lua_controller>
     
 </controllers>

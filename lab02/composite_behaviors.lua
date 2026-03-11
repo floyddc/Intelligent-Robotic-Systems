@@ -79,7 +79,6 @@ function step()
     end
     
     robot.wheels.set_velocity(left_v, right_v)
-    end
 end
 
 function reset()
