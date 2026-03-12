@@ -14,6 +14,7 @@ function init()
     right_v = MAX_VELOCITY
     robot.wheels.set_velocity(left_v, right_v)
     if robot.leds then robot.leds.set_all_colors("green") end
+    math.randomseed(os.time())
 end
 
 function step()
@@ -62,20 +63,30 @@ function step()
     
     -- combine both steering commands
     local total_turn = light_turn + obstacle_turn
-    
-    -- smooth differential steering with asymmetric speeds
-    if total_turn > 0 then
-        -- turn right: left wheel faster, right wheel slower
-        left_v = TURN_FAST * MAX_VELOCITY * speed_factor
-        right_v = TURN_SLOW * MAX_VELOCITY * speed_factor
-    elseif total_turn < 0 then
-        -- turn left: right wheel faster, left wheel slower
-        left_v = TURN_SLOW * MAX_VELOCITY * speed_factor
-        right_v = TURN_FAST * MAX_VELOCITY * speed_factor
+
+    -- simple random walk when no light and no close obstacles
+    if total_light < 0.1 and max_prox < 0.1 and math.abs(total_turn) < 0.01 then
+        if math.random() < 0.5 then
+            left_v = TURN_FAST * MAX_VELOCITY * speed_factor
+            right_v = TURN_SLOW * MAX_VELOCITY * speed_factor
+        else
+            left_v = TURN_SLOW * MAX_VELOCITY * speed_factor
+            right_v = TURN_FAST * MAX_VELOCITY * speed_factor
+        end
     else
-        -- straight
-        left_v = MAX_VELOCITY * speed_factor
-        right_v = MAX_VELOCITY * speed_factor
+        if total_turn > 0 then
+            -- turn right: left wheel faster, right wheel slower
+            left_v = TURN_FAST * MAX_VELOCITY * speed_factor
+            right_v = TURN_SLOW * MAX_VELOCITY * speed_factor
+        elseif total_turn < 0 then
+            -- turn left: right wheel faster, left wheel slower
+            left_v = TURN_SLOW * MAX_VELOCITY * speed_factor
+            right_v = TURN_FAST * MAX_VELOCITY * speed_factor
+        else
+            -- straight
+            left_v = MAX_VELOCITY * speed_factor
+            right_v = MAX_VELOCITY * speed_factor
+        end
     end
     
     robot.wheels.set_velocity(left_v, right_v)
