@@ -1,6 +1,6 @@
 MAX_VELOCITY = 80
-LIGHT_GAIN = 1.2        -- steering gain for light attraction
-OBSTACLE_GAIN = 1     -- steering gain for obstacle avoidance
+LIGHT_GAIN = 1        -- steering gain for light attraction
+OBSTACLE_GAIN = 1.5     -- steering gain for obstacle avoidance
 SPEED_REDUCTION = 0.5   -- how much obstacles slow the robot
 TURN_FAST = 0.5         -- outer wheel speed during turn
 TURN_SLOW = 0.2         -- inner wheel speed during turn
@@ -61,6 +61,32 @@ function step()
     local speed_factor = 1.0 - (max_prox * SPEED_REDUCTION)
     speed_factor = clamp(speed_factor, 0.2, 1.0)
     
+    -- detect narrow gap: center sensors low but sides close
+    local mid = math.floor(n_prox/2)
+    local front_sum, front_cnt = 0, 0
+    for i = mid-1, mid+1 do
+        if robot.proximity[i] then front_sum = front_sum + robot.proximity[i].value; front_cnt = front_cnt + 1 end
+    end
+    local front_avg = front_sum / (front_cnt + 0.001)
+    local side_max = 0
+    for i = 1, n_prox do
+        if i < mid-1 or i > mid+1 then side_max = math.max(side_max, robot.proximity[i].value) end
+    end
+
+    -- if center is clear but sides are close, bias to go straight through the gap
+    -- smooth, threshold-free gap handling: compute a continuous score
+    -- gap_score in [-1,1]: positive means sides > front (potential gap)
+    local gap_score = (side_max - front_avg) / (side_max + front_avg + 0.001)
+    -- convert to a weight in [0,1] (negative values -> 0)
+    local gap_weight = clamp(gap_score, 0.0, 1.0)
+
+    -- blend speed and steering attenuation smoothly using gap_weight
+    speed_factor = clamp(speed_factor + 0.3 * gap_weight, 0.2, 1.0)
+    local light_atten = 1.0 - (0.7 * gap_weight)      -- up to 70% attenuation
+    local obstacle_atten = 1.0 - (0.8 * gap_weight)   -- up to 80% attenuation
+    light_turn = light_turn * light_atten
+    obstacle_turn = obstacle_turn * obstacle_atten
+
     -- combine both steering commands
     local total_turn = light_turn + obstacle_turn
 
