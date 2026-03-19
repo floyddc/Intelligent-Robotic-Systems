@@ -1,5 +1,5 @@
 -- Subsumption architecture for foot-bot
--- Priority order: halt > obstacle avoidance > phototaxis > random walk
+-- Prioritize behaviors: halt > obstacle avoidance > phototaxis > random walk
 
 MAX_VELOCITY = 60
 
@@ -32,22 +32,24 @@ end
 function phototaxis(left_v, right_v)
     local light = robot.light
     local max_val = 0
-    local max_angle = 0
+    local lx, ly, total_light = 0, 0, 0
 
     for i=1, #light do
-        if light[i].value > max_val then
-            max_val = light[i].value
-            max_angle = light[i].angle
-        end
+        local value = light[i].value
+        local angle = light[i].angle
+        lx = lx + value * math.cos(angle)
+        ly = ly + value * math.sin(angle)
+        total_light = total_light + value
     end
 
-    if max_val > 0 then
-        local gain = 10
-        left_v = MAX_VELOCITY - gain * max_angle
-        right_v = MAX_VELOCITY + gain * max_angle
+    if total_light < 0.001 then
+        return 0, total_light
     end
 
-    return left_v, right_v
+    local angle = math.atan2(ly, lx)
+    local light_turn = LIGHT_GAIN * angle * MAX_VELOCITY
+
+    return light_turn, total_light
 end
 
 function obstacle_avoidance(left_v, right_v)
