@@ -23,8 +23,8 @@
 				<leds implementation="default" medium="leds" />
       </actuators>
       <sensors>
-        <footbot_proximity implementation="default" show_rays="true" noise_level="0.01" />
-        <footbot_light implementation="rot_z_only" show_rays="true" noise_level="0.01" />
+        <footbot_proximity implementation="default" show_rays="true" noise_level="0.02" />
+        <footbot_light implementation="rot_z_only" show_rays="true" noise_level="0.02" />
         <footbot_motor_ground implementation="rot_z_only" noise_level="0.01" />
         <differential_steering implementation="default" noise_level="0.0"/>
 				<positioning implementation="default" noise_level="0.0" />

@@ -45,9 +45,7 @@ local function ps_oa()
         local reading = robot.proximity[i]
         if reading.value > 0 then
             -- Repulsive: push in the opposite direction (angle + pi)
-            local v = {
-                length = reading.value,
-                angle  = reading.angle + math.pi
+            local v = {length = reading.value, angle  = reading.angle + math.pi
             }
             result = vector.vec2_polar_sum(result, v)
         end

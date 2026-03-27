@@ -7,7 +7,32 @@ Each behavior is modeled as a **potential field** that produces a force vector o
 The key behaviors are: phototaxis (attractive field toward light), obstacle avoidance (repulsive field away from obstacles), and a uniform forward drive for exploration.
 
 ## Controller architecture - Motor Schemas
-The controller is implemented in `controller-ms.lua` and uses the `vector.lua` module for polar/cartesian vector operations. It includes the following components:
+The controller is implemented in `controller-ms.lua` and uses the `vector.lua` module for polar/cartesian vector operations.<br>
+```
+| SENSORS 
+   |→ Light
+   |→ Proximity
+   |→ Ground
+|
+| PERCEPTUAL SCHEMAS
+|→ Phototaxis ("Where's the light?")
+   |→ attractive motor schema
+|→ Obstacle avoidance ("Where not to go?")
+   |→ repulsive motor schema
+|→ Uniform ("Keep moving")
+   |→ constraint
+|
+| VECTORS 
+   |→ Module + direction
+|
+| COMBINATION
+   |→ Vectorial sum
+|
+| ACTUATION
+   |→ Vector → wheel speed conversion
+   |→ Emerging behavior
+```
+It includes the following components:
 
 - **Perceptual Schema 1 – Phototaxis (attractive field)**: sums all 24 light sensor readings as polar vectors `{length = value, angle = sensor_angle}`. The resulting vector points toward the brightest region and is scaled by `LIGHT_GAIN`.
 - **Perceptual Schema 2 – Obstacle avoidance (repulsive field)**: each of the 24 proximity sensors produces a repulsive vector in the opposite direction (`angle + π`) with magnitude proportional to the reading. The sum is scaled by `OBSTACLE_GAIN`.
