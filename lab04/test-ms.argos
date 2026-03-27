@@ -69,13 +69,6 @@
       </entity>
     </distribute>
     
-    <distribute>
-      <position method="uniform" min="-2,-2.5,0" max="1.5,2.5,0" />
-      <orientation method="uniform" min="0,0,0" max="360,0,0" />
-      <entity quantity="5" max_trials="100">
-        <box id="o2" size="0.2, 1, 0.2" movable="false" />
-      </entity>
-    </distribute>
 
     <distribute>
       <position method="uniform" min="-2,-2.5,0" max="1.5,2.5,0" />

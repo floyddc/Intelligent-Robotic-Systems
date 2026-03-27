@@ -7,6 +7,8 @@ OBSTACLE_GAIN    = 12    -- gain for the repulsive obstacle field
 UNIFORM_GAIN     = 8     -- constant forward drive (exploration base speed)
 ANGULAR_GAIN     = 1.5   -- gain to convert resultant angle into omega
 HALT_THRESHOLD   = 0.1   -- ground sensor value below which = black spot
+-- max lenght = 100
+HALT_GAIN        = 101   -- gain for the halt-on-black perceptual schema
 
 -- Global state
 L = 0            -- inter-wheel distance
@@ -45,8 +47,7 @@ local function ps_oa()
         local reading = robot.proximity[i]
         if reading.value > 0 then
             -- Repulsive: push in the opposite direction (angle + pi)
-            local v = {length = reading.value, angle  = reading.angle + math.pi
-            }
+            local v = {length = reading.value, angle  = reading.angle + math.pi}
             result = vector.vec2_polar_sum(result, v)
         end
     end
@@ -61,15 +62,21 @@ local function ps_uniform()
     return {length = UNIFORM_GAIN, angle = 0}
 end
 
--- Halt on black spot
--- Returns true when at least one ground sensor reads below threshold
-local function on_black_spot()
+-- Perceptual schema 4 – Halt on black spot (braking field)
+-- When the ground is dark, produce a strong backward vector (angle = pi) whose intensity is proportional to how dark the reading is.
+local function ps_halt()
+    local result = {length = 0, angle = 0}
     for i = 1, #robot.motor_ground do
-        if robot.motor_ground[i].value < HALT_THRESHOLD then
-            return true
+        local val = robot.motor_ground[i].value  ---could be 1 or 0 depending on the color of the ground
+        if val < HALT_THRESHOLD then
+            -- intensity 1 when val = 0 (black), otherwise intensity 0 
+            local intensity = 1 - (val / HALT_THRESHOLD)
+            local v = {length = intensity, angle = math.pi}
+            result = vector.vec2_polar_sum(result, v)
         end
     end
-    return false
+    result.length = result.length * HALT_GAIN
+    return result
 end
 
 -- Convert resultant vector to differential wheel velocities
@@ -95,24 +102,23 @@ function step()
     n_steps = n_steps + 1
 
     -- Individual motor schema vectors
-    local pt_vec    = ps_pt()
-    local oa_vec = ps_oa()
-    local uniform_vec  = ps_uniform()
+    local pt_vec      = ps_pt()
+    local oa_vec      = ps_oa()
+    local uniform_vec = ps_uniform()
+    local halt_vec    = ps_halt()
 
     -- Sum all vectors to obtain the resultant
     local resultant = vector.vec2_polar_sum(pt_vec, oa_vec)
     resultant       = vector.vec2_polar_sum(resultant, uniform_vec)
+    resultant       = vector.vec2_polar_sum(resultant, halt_vec)
 
     -- Convert to wheel velocities
     local vl, vr = vector_to_wheels(resultant)
 
-    -- Halt on black spot
-    if on_black_spot() then
-        vl = 0
-        vr = 0
+    -- LED feedback
+    if halt_vec.length > 0 then
         robot.leds.set_all_colors("red")
     else
-        -- yellow led when perceiving significant light, green otherwise
         local total_light = 0
         for i = 1, #robot.light do
             total_light = total_light + robot.light[i].value
