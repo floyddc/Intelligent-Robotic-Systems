@@ -1,0 +1,2 @@
+- Task 5 – `n_eval=1`: la fitness stimata è rumorosa (un robot può avere fortuna/sfortuna nella posizione iniziale casuale), quindi la selezione premia individui che non sono realmente migliori → convergenza instabile.
+- Task 6 – `n_eval=3 + min`: più conservativo di `mean` — un individuo viene valutato dal suo peggior risultato, il che riduce il rischio di selezionare individui "fortunati" ma aumenta la pressione selettiva e può rallentare la convergenza
