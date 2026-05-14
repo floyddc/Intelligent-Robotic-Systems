@@ -1,5 +1,5 @@
 # Lab 02 - Composite behaviors
-**Author:** Diego Colì - 0001172691<br><br>
+**Author:** Diego Colì - diego.coli@studio.unibo.it<br><br>
 This lab exercise requires that the robot goes in the direction of the light while avoiding obstacles.
 
 ## Idea
