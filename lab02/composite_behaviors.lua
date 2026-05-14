@@ -1,9 +1,7 @@
-MAX_VELOCITY = 80
+MAX_VELOCITY = 15
 LIGHT_GAIN = 1        -- steering gain for light attraction
 OBSTACLE_GAIN = 1.5     -- steering gain for obstacle avoidance
 SPEED_REDUCTION = 0.5   -- how much obstacles slow the robot
-TURN_FAST = 0.5         -- outer wheel speed during turn
-TURN_SLOW = 0.2         -- inner wheel speed during turn
 
 local function clamp(x,a,b) 
     if x<a then return a elseif x>b then return b else return x end 
@@ -90,33 +88,24 @@ function step()
     -- combine both steering commands
     local total_turn = light_turn + obstacle_turn
 
-    -- simple random walk when no light and no close obstacles
-    if total_light < 0.1 and max_prox < 0.1 and math.abs(total_turn) < 0.01 then
-        if math.random() < 0.5 then
-            left_v = TURN_FAST * MAX_VELOCITY * speed_factor
-            right_v = TURN_SLOW * MAX_VELOCITY * speed_factor
-        else
-            left_v = TURN_SLOW * MAX_VELOCITY * speed_factor
-            right_v = TURN_FAST * MAX_VELOCITY * speed_factor
-        end
-    else
-        if total_turn > 0 then
-            -- turn right: left wheel faster, right wheel slower
-            left_v = TURN_FAST * MAX_VELOCITY * speed_factor
-            right_v = TURN_SLOW * MAX_VELOCITY * speed_factor
-        elseif total_turn < 0 then
-            -- turn left: right wheel faster, left wheel slower
-            left_v = TURN_SLOW * MAX_VELOCITY * speed_factor
-            right_v = TURN_FAST * MAX_VELOCITY * speed_factor
-        else
-            -- straight
-            left_v = MAX_VELOCITY * speed_factor
-            right_v = MAX_VELOCITY * speed_factor
-        end
+    -- base forward speed
+    local base_speed = MAX_VELOCITY * speed_factor
+
+    -- random exploration when nothing is perceived
+    if total_light < 0.1 and max_prox < 0.1 then
+        total_turn = total_turn + (math.random() - 0.5) * 2
     end
-    
-    robot.wheels.set_velocity(left_v, right_v)
-end
+
+    -- continuous steering
+    left_v  = base_speed + total_turn
+    right_v = base_speed - total_turn
+
+    -- clamp wheel velocities
+    left_v  = clamp(left_v,  -MAX_VELOCITY, MAX_VELOCITY)
+    right_v = clamp(right_v, -MAX_VELOCITY, MAX_VELOCITY)
+        
+        robot.wheels.set_velocity(left_v, right_v)
+    end
 
 function reset()
     left_v = MAX_VELOCITY
