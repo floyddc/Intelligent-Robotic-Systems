@@ -1,7 +1,8 @@
 -- Subsumption architecture for foot-bot
 -- Prioritize behaviors: halt > obstacle avoidance > phototaxis > random walk
 
-MAX_VELOCITY = 60
+MAX_VELOCITY = 15
+GROUND_THRESHOLD = 0.5
 
 function init()
     left_v = 0
@@ -26,12 +27,13 @@ function step()
 end
 
 function random_walk()
-    return MAX_VELOCITY * (math.random() - 0.5), MAX_VELOCITY * (math.random() - 0.5)
+    local base = 10
+    local noise = 3
+    return base + noise * (math.random()-0.5), base + noise * (math.random()-0.5)
 end
 
 function phototaxis(left_v, right_v)
     local light = robot.light
-    local max_val = 0
     local lx, ly, total_light = 0, 0, 0
 
     for i=1, #light do
@@ -43,13 +45,15 @@ function phototaxis(left_v, right_v)
     end
 
     if total_light < 0.001 then
-        return 0, total_light
+        return left_v, right_v
     end
 
     local angle = math.atan2(ly, lx)
-    local light_turn = LIGHT_GAIN * angle * MAX_VELOCITY
 
-    return light_turn, total_light
+    left_v = left_v - angle * MAX_VELOCITY
+    right_v = right_v + angle * MAX_VELOCITY
+
+    return left_v, right_v
 end
 
 function obstacle_avoidance(left_v, right_v)
@@ -82,11 +86,11 @@ function halt(left_v, right_v)
     local ground = robot.motor_ground
 
     for i=1, #ground do
-        if ground[i].value < 0.1 then
+        print(ground[i].value)
+        if ground[i].value < GROUND_THRESHOLD then
             return 0, 0
         end
     end
-
     return left_v, right_v
 end
 
