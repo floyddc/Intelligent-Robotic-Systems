@@ -1,6 +1,5 @@
 # Lab 02 - Composite behaviors
-**Author:** Diego Colì - diego.coli@studio.unibo.it<br><br>
-This lab exercise requires that the robot goes in the direction of the light while avoiding obstacles.
+**Author:** Diego Colì - diego.coli@studio.unibo.it<br>
 
 ## Idea
 My idea is to combine the two main behaviors (phototaxis and collision avoidance)through continuous behavior blending. Each behavior produces a steering contribution, and the final wheel velocities are obtained by combining these contributions into a single continuous motor command.
