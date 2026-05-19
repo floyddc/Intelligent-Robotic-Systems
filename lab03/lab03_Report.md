@@ -1,4 +1,4 @@
-# Lab 03 - Subsumption Architecture
+# Lab 03 - Subsumption architecture
 **Author:** Diego Colì - diego.coli@studio.unibo.it<br>
 ## Idea
 Behaviors are organized in a strict priority hierarchy. Each layer receives wheel velocities from lower layers and can modify them (the halt layer may completely override them). The final command is set by the highest-priority layer whose condition is active.
