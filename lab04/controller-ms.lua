@@ -26,16 +26,22 @@ end
 
 -- Perceptual schema 1 – Phototaxis (attractive field)
 -- Sum all light sensor readings as vectors; the result points toward the brightest region.
+-- Sets LED to yellow when significant light is perceived.
 local function ps_pt()
     local result = {length = 0, angle = 0}
+    local total_light = 0
     for i = 1, #robot.light do
         local reading = robot.light[i]
         -- Each sensor contributes a vector toward its direction
         local v = {length = reading.value, angle = reading.angle}
         result = vector.vec2_polar_sum(result, v)
+        total_light = total_light + reading.value
     end
     -- Scale by the gain
     result.length = result.length * LIGHT_GAIN
+    if total_light > 0.5 then
+        robot.leds.set_all_colors("yellow")
+    end
     return result
 end
 
@@ -58,12 +64,15 @@ end
 
 -- Perceptual schema 3 – Uniform forward drive (exploration)
 -- A small constant vector pointing straight ahead so the robot keeps moving even when no stimulus is perceived.
+-- Sets the default LED color (green) as baseline; higher-priority schemas may override it.
 local function ps_uniform()
+    robot.leds.set_all_colors("green")
     return {length = UNIFORM_GAIN, angle = 0}
 end
 
 -- Perceptual schema 4 – Halt on black spot (braking field)
 -- When the ground is dark, produce a strong backward vector (angle = pi) whose intensity is proportional to how dark the reading is.
+-- Sets LED to red when active, overriding any previously set color.
 local function ps_halt()
     local result = {length = 0, angle = 0}
     for i = 1, #robot.motor_ground do
@@ -76,6 +85,9 @@ local function ps_halt()
         end
     end
     result.length = result.length * HALT_GAIN
+    if result.length > 0 then
+        robot.leds.set_all_colors("red")
+    end
     return result
 end
 
@@ -95,16 +107,12 @@ local function vector_to_wheels(resultant)
     return vl, vr
 end
 
-
-
--- step (called every tick)
 function step()
     n_steps = n_steps + 1
 
-    -- Individual motor schema vectors
+    local uniform_vec = ps_uniform()
     local pt_vec      = ps_pt()
     local oa_vec      = ps_oa()
-    local uniform_vec = ps_uniform()
     local halt_vec    = ps_halt()
 
     -- Sum all vectors to obtain the resultant
@@ -114,21 +122,6 @@ function step()
 
     -- Convert to wheel velocities
     local vl, vr = vector_to_wheels(resultant)
-
-    -- LED feedback
-    if halt_vec.length > 0 then
-        robot.leds.set_all_colors("red")
-    else
-        local total_light = 0
-        for i = 1, #robot.light do
-            total_light = total_light + robot.light[i].value
-        end
-        if total_light > 0.5 then
-            robot.leds.set_all_colors("yellow")
-        else
-            robot.leds.set_all_colors("green")
-        end
-    end
 
     -- Actuate
     robot.wheels.set_velocity(vl, vr)
