@@ -14,9 +14,9 @@ The controller (`controller-ms.lua`) uses `vector.lua` for polar/cartesian opera
 - **LED feedback**: red when halted, yellow when light is perceived, green otherwise.
 
 All schema vectors are summed with `vec2_polar_sum()`. The resultant is converted to wheel speeds via the differential drive model:
-- $v = \text{clamp}(|\vec{r}|,\, 0,\, 15)$
-- $\omega = 1.5 \cdot \angle\vec{r}$
-- $v_{l,r} = v \mp \omega \cdot L/2$.
+- `v = clamp(|r|, 0, 15)`
+- `ω = 1.5 · angle(r)`
+- `vl = v - ω·L/2`, `vr = v + ω·L/2`.
 
 ## Expected behavior
 - The robot steers toward the light (phototaxis) while the uniform drive ensures continuous forward motion.
