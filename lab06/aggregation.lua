@@ -67,7 +67,7 @@ function step()
       robot.range_and_bearing.set_data(1, 0)
       robot.leds.set_all_colors("green")
 
-      -- Try to avoid obstacles; if none, move straight
+      -- Try to avoid obstacles. If none, move straight
       if not obstacleAvoidance() then
          robot.wheels.set_velocity(SPEED, SPEED)
       end
