@@ -93,15 +93,17 @@ def print_stats(pop,fv):
     print("\n")
 
 # Main GA loop
+
+# 1. Initial population (POP_SIZE individuals)
 population = [create_individual() for _ in range(POP_SIZE)]
 
-#print("Random solution:", population[0])
-
-# REPLACEMENT
+# Replacement
 for gen in range(GENERATIONS):
+    # 2. Individuals evaluation -> fitness generation 
     fitness_values = [fitness(i) for i in population]
     new_population = []
 
+    # Elitism
     if ELITE_SIZE > 0:
         elite_indices = sorted(range(POP_SIZE), key=lambda i: fitness_values[i], reverse=True)[:ELITE_SIZE]
         elite = [list(population[i]) for i in elite_indices]
@@ -110,12 +112,14 @@ for gen in range(GENERATIONS):
 
     # Fill remaining slots with offspring
     for _ in range(POP_SIZE - len(elite)):
-        #parent1 = select_proportional(population, fitness_values)
-        #parent2 = select_proportional(population, fitness_values)
+        # 3. Selection step
         parent1 = select_tournament(population, fitness_values)
         parent2 = select_tournament(population, fitness_values)
+        # 4. Crossover
         child = crossover(parent1, parent2)
+        # 5. Mutation
         child = mutate(child)
+        # 6. New population 
         new_population.append(child)
 
     population = elite + new_population
