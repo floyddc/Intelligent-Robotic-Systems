@@ -3,7 +3,7 @@
 
 ## Idea
 The goal is to make a swarm of robots aggregate into a single cluster using only local interactions, without any centralised control.<br>
-Each robot runs a stochastic two-state FSM (moving/stopped). Transition probabilities are modulated by the number of stopped neighbours perceived via the range-and-bearing (RAB) sensor: the more stopped robots nearby, the more likely a moving robot stops, and the less likely a stopped robot resumes walking. This positive feedback drives the swarm toward a single large cluster.
+Each robot runs a stochastic two-state FSM (moving/stopped). Transition probabilities are modulated by the number of stopped neighbours perceived via the range-and-bearing (RAB) sensor: the more stopped robots nearby, the more likely a moving robot stops, and the less likely a stopped robot resumes walking. Positive feedback promotes cluster growth, while negative feedback prevents small unstable aggregates from persisting. Together they drive the swarm toward the formation of one dominant cluster.
 
 ## Controller architecture
 The controller (`aggregation.lua`) implements the following components:

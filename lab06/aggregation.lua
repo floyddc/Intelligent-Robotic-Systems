@@ -67,9 +67,11 @@ function step()
       robot.range_and_bearing.set_data(1, 0)
       robot.leds.set_all_colors("green")
 
-      -- Try to avoid obstacles. If none, move straight
+      -- Try to avoid obstacles. If none, random walk
       if not obstacleAvoidance() then
-         robot.wheels.set_velocity(SPEED, SPEED)
+         local left  = SPEED + robot.random.uniform(-2, 2)
+         local right = SPEED + robot.random.uniform(-2, 2)
+         robot.wheels.set_velocity(left, right)
       end
 
       -- Decide whether to stop
