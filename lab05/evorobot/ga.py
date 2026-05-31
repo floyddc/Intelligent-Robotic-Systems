@@ -40,7 +40,7 @@ def fitness(individual):
 
 # Selection: tournament
 # Randomly pick 2 individuals and return the one with the highest fitness
-def select_tournament(population, fitness_values, k=3):
+def select_tournament(population, fitness_values, k=2):
     candidates = random.sample(range(len(population)), k)
     best = max(candidates, key=lambda i: fitness_values[i])
     return population[best]
@@ -101,6 +101,7 @@ population = [create_individual() for _ in range(POP_SIZE)]
 for gen in range(GENERATIONS):
     # 2. Individuals evaluation -> fitness generation 
     fitness_values = [fitness(i) for i in population]
+    print_stats(population, fitness_values)
     new_population = []
 
     # Elitism
@@ -123,4 +124,3 @@ for gen in range(GENERATIONS):
         new_population.append(child)
 
     population = elite + new_population
-    print_stats(population, fitness_values)

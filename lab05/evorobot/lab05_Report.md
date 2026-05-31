@@ -23,7 +23,7 @@ The fitness is computed at the end of the simulation as `fitness = (dmax - d) / 
 ## Genetic Algorithm
 The GA (`ga.py`) implements the following components:
 - Population initialization: random genomes in [-1,1].
-- Fitness evaluation: each individual is evaluated N_EVAL = 3 times to reduce stochastic effects caused by noise and random initial conditions.
+- Fitness evaluation: each individual is evaluated `N_EVAL = 3` times to reduce stochastic effects caused by noise and random initial conditions.
 - Selection operator: tournament (roulette wheel as an alternative).
 - Crossover: linear interpolation between parent genomes.
 - Mutation: Gaussian mutation with mean 0 and standard deviation 1, applied independently to each gene with probability `MUTATION_RATE = 0.1`.
