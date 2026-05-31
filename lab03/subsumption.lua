@@ -7,6 +7,7 @@ GROUND_THRESHOLD = 0.5
 function init()
     left_v = 0
     right_v = 0
+    math.randomseed(os.time())
 end
 
 function step()
@@ -86,7 +87,6 @@ function halt(left_v, right_v)
     local ground = robot.motor_ground
 
     for i=1, #ground do
-        print(ground[i].value)
         if ground[i].value < GROUND_THRESHOLD then
             return 0, 0
         end
