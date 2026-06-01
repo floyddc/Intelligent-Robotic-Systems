@@ -4,7 +4,7 @@
 ## Idea
 Each behavior is modeled as a **potential field** producing a force vector. All vectors are summed into a single resultant, converted to differential wheel velocities.
 
-## Controller architecture
+## Controller architecture - Possible solution
 The controller (`controller-ms.lua`) uses `vector.lua` for polar/cartesian operations and implements four perceptual schemas:
 
 - **Phototaxis (attractive)**: sums all 24 light sensor readings as polar vectors. The result points toward the brightest region, scaled by `LIGHT_GAIN = 80`.
