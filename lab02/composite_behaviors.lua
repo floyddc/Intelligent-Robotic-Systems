@@ -103,9 +103,9 @@ function step()
     -- clamp wheel velocities
     left_v  = clamp(left_v,  -MAX_VELOCITY, MAX_VELOCITY)
     right_v = clamp(right_v, -MAX_VELOCITY, MAX_VELOCITY)
-        
-        robot.wheels.set_velocity(left_v, right_v)
-    end
+    
+    robot.wheels.set_velocity(left_v, right_v)
+end
 
 function reset()
     left_v = MAX_VELOCITY
